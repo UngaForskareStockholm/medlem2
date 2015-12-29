@@ -20,7 +20,7 @@ class Model(object):
 	def _cache_populate(self, key):
 		if key not in self.COLUMNS:
 			raise Exception("No column: %s"%key)
-		self._db.cursor.execute("SELECT %s FROM %s WHERE %s = %s"%(key, self._table, self._primary_key, "%s"), (self._id,))
+		self._db.cursor.execute("SELECT %s FROM %s WHERE %s = %%s"%(key, self._table, self._primary_key), (self._id,))
 		value = self._db.cursor.fetchall()[0][0]
 		self._db.conn.commit()
 		self._cache[key] = value
@@ -38,7 +38,7 @@ class Model(object):
 	def __setitem__(self, key, value):
 		if key not in self.COLUMNS:
 			raise Exception("No column: %s"%key)
-		self._db.cursor.execute("UPDATE %s SET %s = %s WHERE %s = %s"%(self._table, key, "%s", self._primary_key, "%s"), (value, self._id))
+		self._db.cursor.execute("UPDATE %s SET %s = %%s WHERE %s = %%s"%(self._table, key, self._primary_key), (value, self._id))
 		self._db.conn.commit()
 		self._cache_populate(key)
 
