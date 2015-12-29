@@ -39,7 +39,7 @@ class User(object):
 			cherrypy.response.status = 400
 			return '{"error": "user.password.fields_do_not_match"}\n'
 		user = model.user.User(cherrypy.session["user_id"])
-		if not user.authenticate(current_password):
+		if not user.authenticate(current_password, login=False):
 			cherrypy.response.status = 400
 			return '{"error": "authentication.invalid_username_or_password"}\n'
 		user.set_password(new_password)
