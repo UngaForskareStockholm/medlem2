@@ -1,0 +1,98 @@
+POST /authentication/login:
+Log in an existing user.
+		username(string, formData, required): User Name.
+		password(string(password), formData, required): Password.
+
+Responses:
+200:
+Success
+	{
+		name(string): User's name.
+	}	
+401:
+Fail
+	{
+		error(string): Error message.
+	}
+
+TODO: functions for getting permitted orgs/years.
+
+POST /set_org_info:
+TODO: Divvy this up into smaller chunks? more dynamic setter?
+Set info into the relevant reporting_year.
+	{
+		reporting_year_id(string, required): current reporting_year.
+		name(string, required): Name of organization.
+		email(string, required): Email address.
+		phone(string): Telephone Number.
+		address_line1(string, required): Line 1 of address.
+		address_line2(string): Line 2 of address.
+		postal_code(string): Postal Code.
+		location_address_line1(string): Line 1 of location addr.
+		location_address_line2(string): Line 2 of location addr.
+		contactperson_name(string, required): Name of contact.
+		contactperson_phone(string, required): tel.nr. of contact.
+		contactperson_email(string, required): email.addr. of cont.
+		bank(string, required): Bank (handle BG/PG specially).
+		town(string, required): Town of activity.
+		account_nr(string, required): Bank account number.
+	}
+Returns:
+200:
+Success
+	{}		
+400:
+Fail
+	{
+		errors(object) 
+		{
+			error_pos(string): Error position (variable name).
+			error_msg(string): Error message.
+		}		 
+	}
+
+POST /set_year_report_texts:
+Set texts.
+	{
+		reporting_year_id(string, required): current reporting_year.
+		activity_text(string, required): Activity description
+		financial_text(string, required): Financial activity descr.
+	}
+
+Returns:
+200:
+Success
+	{}
+400:
+Fail
+	{
+		errors(object)
+		{
+			error_pos(string): Error position (variable name).
+			error_msg(string): Error message.
+		}
+	}
+
+POST /set_board:
+Sets the entirety of the board for a certain reporting_year
+TODO: Maybe add function to show possible users in order to specify precisely.
+	{
+		reporting_year_id(string, required): current reporting_year.
+		board(object, required)
+		{
+			member_id(string) Org member to specify.
+			title(string): Board Title.
+		}
+	}
+
+Responses:
+200:
+Success
+	{}
+400:
+Failure
+	{
+		error(string): Error message.
+	}
+
+
