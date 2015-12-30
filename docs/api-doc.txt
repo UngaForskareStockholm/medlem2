@@ -8,69 +8,110 @@ Responses:
 Success
 	{
 		name(string): User's name.
+	}
+400:
+Fail
+	{
+		error(string): Error message.
 	}	
 401:
+Fail (auth)
+	{
+		error(string): Error message.
+	}
+
+GET /organization/
+Get organizations.
+	{
+		organizations = 
+		[
+			organization_id(string): organization_id.
+		]
+	}
+
+Responses:
+200:
+Success
+	[
+		name(string): Name of organization.
+		years(string): 
+			{
+				year(string): Year. 
+				organization_id(string): reporting_year_id. 
+			}	
+	]	
+		
+
+
+get /organization/list
+List organizations accessible by user
+
+Returns:
+200:
+Success
+	{
+		organizations = {
+			organization_name(string): Name of organization.
+			organization_id(string): organization_id.
+		}
+	}
+400:
+Fail
+	{
+		error(String): Error message.
+	}
+
+GET /report/
+Get current reporting data
+
+	{
+		reporting_year_id(string): reporting_year_id.
+	}
+Responses:
+200:
+Success
+	{
+                reporting_year_id(string): current reporting_year.
+                name(string): Name of organization.
+                email(string): Email address.
+                phone(string): Telephone Number.
+                address_line1(string): Line 1 of address.
+                address_line2(string): Line 2 of address.
+                postal_code(string): Postal Code.
+                location_address_line1(string): Line 1 of location addr.
+                location_address_line2(string): Line 2 of location addr.
+                contactperson_name(string): Name of contact.
+                contactperson_phone(string): tel.nr. of contact.
+                contactperson_email(string): email.addr. of cont.
+                bank(string): Bank (handle BG/PG specially).
+                town(string): Town of activity.
+                account_nr(string): Bank account number.
+		activity_text(string): Activity description
+		financial_text(string): Financial activity descr.
+	}
+400:
 Fail
 	{
 		error(string): Error message.
 	}
 
-TODO: functions for getting permitted orgs/years.
-
-POST /set_org_info:
-TODO: Divvy this up into smaller chunks? more dynamic setter?
-Set info into the relevant reporting_year.
+get /report/create
+Create reporting year
 	{
-		reporting_year_id(string, required): current reporting_year.
-		name(string, required): Name of organization.
-		email(string, required): Email address.
-		phone(string): Telephone Number.
-		address_line1(string, required): Line 1 of address.
-		address_line2(string): Line 2 of address.
-		postal_code(string): Postal Code.
-		location_address_line1(string): Line 1 of location addr.
-		location_address_line2(string): Line 2 of location addr.
-		contactperson_name(string, required): Name of contact.
-		contactperson_phone(string, required): tel.nr. of contact.
-		contactperson_email(string, required): email.addr. of cont.
-		bank(string, required): Bank (handle BG/PG specially).
-		town(string, required): Town of activity.
-		account_nr(string, required): Bank account number.
+		organization_id(string, required): organization_id.
+		year(string, required): year.
 	}
-Returns:
+
+Responses:
 200:
 Success
-	{}		
+	{
+		reporting_year(string): reporting_year_id
+	}
 400:
 Fail
 	{
-		errors(object) 
-		{
-			error_pos(string): Error position (variable name).
-			error_msg(string): Error message.
-		}		 
-	}
-
-POST /set_year_report_texts:
-Set texts.
-	{
-		reporting_year_id(string, required): current reporting_year.
-		activity_text(string, required): Activity description
-		financial_text(string, required): Financial activity descr.
-	}
-
-Returns:
-200:
-Success
-	{}
-400:
-Fail
-	{
-		errors(object)
-		{
-			error_pos(string): Error position (variable name).
-			error_msg(string): Error message.
-		}
+		error(string): Error message.
 	}
 
 POST /set_board:
@@ -94,5 +135,4 @@ Failure
 	{
 		error(string): Error message.
 	}
-
 
