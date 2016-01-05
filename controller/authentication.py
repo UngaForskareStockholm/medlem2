@@ -17,12 +17,14 @@ class Authentication(object):
 				cherrypy.session["authenticated"] = True
 				cherrypy.session["user_id"] = user["user_id"]
 				cherrypy.session["name"] = user["name"]
-				return '{"name": "%s"}\n' % user["name"]
+				cherrypy.response.headers['Content-Type']= 'text/json'
+				return '{"name": "%s", "user_id": %s}\n' % (user["name"], int(user["user_id"]))
 		except IndexError:
 			pass
 		except:
 			raise
 		cherrypy.response.status = 401
+		cherrypy.response.headers['Content-Type']= 'text/json'
 		return '{"error": "fail"}\n'
 
 	@cherrypy.expose
