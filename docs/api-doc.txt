@@ -8,6 +8,7 @@ Responses:
 Success
 	{
 		name(string): User's name.
+		user_id(string): user_id
 	}
 400:
 Fail
@@ -80,7 +81,9 @@ Success
                 postal_code(string): Postal Code.
                 location_address_line1(string): Line 1 of location addr.
                 location_address_line2(string): Line 2 of location addr.
-                contactperson_name(string): Name of contact.
+		location_postal_code(string): Postal Code of location addr.
+                contactperson_first_name(string): First name of contact.
+                contactperson_last_name(string): Last name of contact.
                 contactperson_phone(string): tel.nr. of contact.
                 contactperson_email(string): email.addr. of cont.
                 bank(string): Bank (handle BG/PG specially).
