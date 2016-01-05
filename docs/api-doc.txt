@@ -14,7 +14,7 @@ Fail
 	{
 		error(string): Error message.
 	}	
-401:
+409:
 Fail (auth)
 	{
 		error(string): Error message.
@@ -114,7 +114,7 @@ Fail
 		error(string): Error message.
 	}
 
-POST /set_board:
+POST /report/set_board:
 Sets the entirety of the board for a certain reporting_year
 TODO: Maybe add function to show possible users in order to specify precisely.
 	{
@@ -135,4 +135,3 @@ Failure
 	{
 		error(string): Error message.
 	}
-
