@@ -1,6 +1,20 @@
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 <script>
-function login_f() {
+function api_login() {
+	$.post(	'http://localhost:8080/authentication/login',
+		$('#loginform').serializeArray(),
+		function(data, textStatus, jqXHR) {
+			console.log(data['name']);
+			$('#stycket').text(data['name']);
+			localStorage.setItem("user_id", data['user_id']);
+		},
+		"json"
+	).fail(function(jqXHR, textStatus, errorThrown) {
+		console.log(jqXHR.responseText);
+		console.log(textStatus);
+		console.log(errorThrown);
+	});
+	return;
 	$.ajax({
 	    url: 'http://localhost:8080/authentication/login',
 	    type: 'POST',
@@ -17,10 +31,12 @@ function login_f() {
 		console.log(errorThrown);
 		}
 	});
-}
+};
 
-function logout_f() {
-	$.
+function api_logout() {
+	$.get('http://localhost:8080/authentication/login')
+	localStorage.clear();
+};
 </script>
 <div id=logindiv>
 <form id=loginform>
@@ -29,6 +45,7 @@ function logout_f() {
 </form>
 </div>
 <p id=stycket></p>
+<input type=button name=logout value=logout id=logout_btn onclick="javascript:api_logout();">
 
 <script>
 $('#loginform').keydown(function(e) {
@@ -36,7 +53,7 @@ var key = e.which;
 if (key == 13) {
 // As ASCII code for ENTER key is "13"
 //$('#loginform').submit(); // Submit form code
-login_f();
+api_login();
 }
 });
 var user_id = localStorage.getItem('user_id');
@@ -44,6 +61,7 @@ if(user_id) {
 	console.info($('#logindiv'));
 	$('#logindiv').hide();
 	$('#stycket').text(user_id);
+} else {
+	$('#logout_btn').hide();
 }
-
 </script>
