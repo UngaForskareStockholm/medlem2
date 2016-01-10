@@ -8,27 +8,28 @@ import model.address
 
 params=dict()
 params['bylaw']='asd'
-m=model.bylaw.Bylaw.create(params, 0)
+params['created_by']=0
+m=model.bylaw.Bylaw.create(params)
 
-print m['bylaw']
+print "asd", m['bylaw']
 
 m['bylaw'] = "aoieusth8isuey4zhj8rifu4hkr"
 
-print m['bylaw']
+print "aoieusth8isuey4zhj8rifu4hkr", m['bylaw']
 
 u=model.user.User(0)
 
-print u['name']
+print "admin", u['name']
 
-print u.authenticate("admin")
+print "True", u.authenticate("admin")
 
-print u.set_password("asd")
+print "None", u.set_password("asd")
 
-print u.authenticate("admin")
+print "False", u.authenticate("admin")
 
-print u.set_password("admin")
+print "None", u.set_password("admin")
 
-print u.authenticate("admin")
+print "True", u.authenticate("admin")
 
 params=dict()
 params['email']=''
@@ -37,4 +38,5 @@ params['address_line1']=''
 params['address_line2']=''
 params['postal_code']=''
 params['town']=''
-a=model.address.Address.create(params, 0)
+params['created_by']=0
+a=model.address.Address.create(params)
