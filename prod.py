@@ -3,4 +3,4 @@
 import cherrypy
 import medlem
 
-wsgiapp = cherrypy.Application(medlem.Medlem(), '/', config="config/production.conf")
+app = cherrypy.Application(medlem.Medlem(), '/', config="config/production.conf")
