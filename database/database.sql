@@ -26,7 +26,7 @@ INSERT INTO users (
 ) VALUES (
 	0,
 	'admin',
-	'admin',
+	'Admin',
 	'$2a$12$lBc7Rcl9NRlszslWbxXFF.wrWqZvgfePV1IFzwkYXMfevqeZJADpq', -- 'admin'
 	0
 );
@@ -43,8 +43,8 @@ INSERT INTO privileges (
 	description
 ) VALUES
 	('ADMIN', 'Full admin of the system'),
-	('ORGANIAZTION_ADMIN', 'Admin for an organization'),
-	('READ_EVERYTHING', 'Read acces to everything')
+	('ORGANIZATION_ADMIN', 'Admin for an organization'),
+	('READ_EVERYTHING', 'Read access to everything')
 ;
 
 CREATE TABLE user_privileges (
@@ -86,8 +86,6 @@ CREATE SEQUENCE address_id_seq START WITH 1;
 
 CREATE TABLE addresses (
 	address_id INTEGER DEFAULT NEXTVAL('address_id_seq'),
-	email TEXT NOT NULL,
-	phone TEXT NOT NULL,
 	address_line1 TEXT NOT NULL,
 	address_line2 TEXT,
 	postal_code TEXT,
@@ -114,17 +112,38 @@ CREATE TABLE bylaws (
 	FOREIGN KEY (approved_by) REFERENCES users (user_id)
 );
 
+CREATE SEQUENCE person_id_seq START WITH 1;
+
+CREATE TABLE persons (
+	person_id INTEGER DEFAULT NEXTVAL('person_id_seq'),
+	first_name TEXT NOT NULL,
+	last_name TEXT,
+	phone TEXT,
+	email TEXT,
+	created_at TIMESTAMPTZ DEFAULT NOW(),
+	created_by INTEGER NOT NULL,
+
+	PRIMARY KEY (person_id),
+	FOREIGN KEY (created_by) REFERENCES users (user_id)
+);
+
 CREATE SEQUENCE reporting_year_id_seq START WITH 1;
 
 CREATE TABLE reporting_years (
 	reporting_year_id INTEGER DEFAULT NEXTVAL('reporting_year_id_seq'),
 	organization_id INTEGER NOT NULL,
 	year TIMESTAMPTZ NOT NULL,
-	contact_id INTEGER,
+	email TEXT,
+	phone TEXT,
+	address_id INTEGER,
 	location_id INTEGER,
+	contactperson_id INTEGER,
 	bylaw_id INTEGER,
+	municipality TEXT,
 	bank TEXT,
 	account_number TEXT,
+	activity_text TEXT,
+	financial_text TEXT,
 	created_at TIMESTAMPTZ DEFAULT NOW(),
 	created_by INTEGER NOT NULL,
 	approved_at TIMESTAMPTZ,
@@ -135,8 +154,9 @@ CREATE TABLE reporting_years (
 	PRIMARY KEY (reporting_year_id),
 	UNIQUE (organization_id, year),
 	FOREIGN KEY (organization_id) REFERENCES organizations (organization_id),
-	FOREIGN KEY (contact_id) REFERENCES addresses (address_id),
+	FOREIGN KEY (address_id) REFERENCES addresses (address_id),
 	FOREIGN KEY (location_id) REFERENCES addresses (address_id),
+	FOREIGN KEY (contactperson_id) REFERENCES persons (person_id),
 	FOREIGN KEY (bylaw_id) REFERENCES bylaws (bylaw_id),
 	FOREIGN KEY (created_by) REFERENCES users (user_id),
 	FOREIGN KEY (approved_by) REFERENCES users (user_id),
@@ -149,8 +169,7 @@ CREATE SEQUENCE member_id_seq START WITH 1;
 
 CREATE TABLE members (
 	member_id INTEGER DEFAULT NEXTVAL('member_id_seq'),
-	first_name TEXT NOT NULL,
-	last_name TEXT NOT NULL,
+	person_id INTEGER NOT NULL,
 	gender genders NOT NULL,
 	birth_date DATE NOT NULL,
 	address_id INTEGER NOT NULL,
@@ -164,6 +183,7 @@ CREATE TABLE members (
 	rejected_by INTEGER,
 
 	PRIMARY KEY (member_id),
+	FOREIGN KEY (person_id) REFERENCES persons(person_id),
 	FOREIGN KEY (address_id) REFERENCES addresses (address_id),
 	FOREIGN KEY (reporting_year_id) REFERENCES reporting_years (reporting_year_id),
 	FOREIGN KEY (created_by) REFERENCES users (user_id),
@@ -173,13 +193,27 @@ CREATE TABLE members (
 
 CREATE TABLE boards (
 	reporting_year_id INTEGER NOT NULL,
-	member_id INTEGER NOT NULL,
+	person_id INTEGER NOT NULL,
 	title TEXT NOT NULL,
 	created_at TIMESTAMPTZ DEFAULT NOW(),
 	created_by INTEGER NOT NULL,
 
-	PRIMARY KEY (reporting_year_id, member_id),
+	PRIMARY KEY (reporting_year_id, person_id),
 	FOREIGN KEY (reporting_year_id) REFERENCES reporting_years (reporting_year_id),
-	FOREIGN KEY (member_id) REFERENCES members (member_id),
+	FOREIGN KEY (person_id) REFERENCES persons (person_id),
+	FOREIGN KEY (created_by) REFERENCES users (user_id)
+);
+
+CREATE SEQUENCE file_id_seq START WITH 1;
+
+CREATE TABLE files (
+	file_id INTEGER NOT NULL,
+	file_name TEXT,
+	mime_type TEXT,
+	file_content TEXT,
+	created_at TIMESTAMPTZ DEFAULT NOW(),
+	created_by INTEGER NOT NULL,
+
+	PRIMARY KEY (file_id),
 	FOREIGN KEY (created_by) REFERENCES users (user_id)
 );

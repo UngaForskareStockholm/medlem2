@@ -19,14 +19,28 @@ class User(model.Model):
 		self._db.cursor.execute("UPDATE users SET deleted_by=%s, deleted_at = NOW() where user_id = %d", by, self._id)
 		self._db.conn.commit()
 
-	def set_password(self, passwd):
-		self['password'] = bcrypt.hashpw(passwd.encode('utf-8'), bcrypt.gensalt())
-
 	def has_access(self, privilige, organization_id=0):
 		self._db.cursor.execute("SELECT 1 FROM user_privileges WHERE user_id = %s AND privilege = %s AND organization_id = %s", (self._id, privilige, organization_id))
 		access = self._db.cursor.rowcount > 0
+		self._db.cursor.execute("SELECT 1 FROM user_privileges WHERE user_id = %s AND (privilege = 'ADMIN' OR privilege = 'READ_EVERYTHING')", (self._id,))
+		access += self._db.cursor.rowcount > 0
 		self._db.conn.commit()
 		return access
+
+	def organizations(self):
+		if self.has_access("ADMIN") or self.has_access("READ_EVERYTHING"):
+			self._db.cursor.execute("SELECT organization_id FROM organizations")
+		else:
+			self._db.cursor.execute("SELECT organization_id FROM user_privileges WHERE user_id = %s AND organization_id <> 0 AND privilege = 'ORGANIZATION_ADMIN'", (self["user_id"],))
+		if self._db.cursor.rowcount == 0:
+			self._db.conn.commit()
+			return tuple()
+		organizations = zip(*self._db.cursor.fetchall())[0]
+		self._db.conn.commit()
+		return organizations
+
+	def set_password(self, passwd):
+		self['password'] = bcrypt.hashpw(passwd.encode('utf-8'), bcrypt.gensalt())
 
 	@classmethod
 	def user_from_email(cls, email):
@@ -36,3 +50,4 @@ class User(model.Model):
 		return cls(user_id)
 
 User.init_model("users", "user_id")
+User.SECRET_COLUMNS.add("password")
