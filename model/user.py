@@ -36,3 +36,4 @@ class User(model.Model):
 		return cls(user_id)
 
 User.init_model("users", "user_id")
+User.SECRET_COLUMNS.add("password")

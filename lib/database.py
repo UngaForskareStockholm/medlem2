@@ -10,7 +10,8 @@ class Database(object):
 	def connect(self, database, host = None, port = None, username = None, password = None):
 		if self.conn:
 			return
-		self._conn_params['database'] = database
+		self.db_name = database
+		self._conn_params['database'] = self.db_name
 		if host:
 			self._conn_params['host'] = host
 		if port:
