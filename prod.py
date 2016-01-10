@@ -3,4 +3,11 @@
 import cherrypy
 import medlem
 
-app = cherrypy.Application(medlem.Medlem(), '/', config="config/production.conf")
+config = {
+	"/": {
+		"tools.sessions.on": True,
+		"tools.gzip.on": True
+	}
+}
+
+app = cherrypy.Application(medlem.Medlem(), '/', config=config)
