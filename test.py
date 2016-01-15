@@ -32,8 +32,6 @@ print "None", u.set_password("admin")
 print "True", u.authenticate("admin")
 
 params=dict()
-params['email']=''
-params['phone']=''
 params['address_line1']=''
 params['address_line2']=''
 params['postal_code']=''
