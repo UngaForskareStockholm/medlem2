@@ -3,6 +3,7 @@
 import cherrypy
 
 import lib.error
+import controller.address_validation
 import controller.authentication
 import controller.organization
 import controller.reporting_year
@@ -15,6 +16,7 @@ class Medlem(object):
 		cherrypy.config.update({"error_page.404": self.error_404})
 		cherrypy.config.update({"request.error_response": self.error_500})
 
+		self.address_validation = controller.address_validation.AddressValidation()
 		self.authentication = controller.authentication.Authentication()
 		self.organization = controller.organization.Organization()
 		self.reporting_year = controller.reporting_year.ReportingYear()
