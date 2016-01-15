@@ -8,16 +8,20 @@ class Model(object):
 		cls._table = table
 		cls._primary_key = primary_key
 		cls._db = lib.database.db
-		cls._db.cursor.execute("SELECT * FROM %s WHERE FALSE"%cls._table)
-		cls.COLUMNS = set([desc.name for desc in cls._db.cursor.description])
-		cls.SECRET_COLUMNS = set(["created_at", "created_by", "approved_at", "approved_by", "rejected_at", "rejected_by", "deleted_at", "deleted_by"])
-		cls._db.cursor.execute("""SELECT column_name FROM information_schema.columns WHERE
-			table_name = '%s'
-			AND table_catalog = '%s'
-			AND is_nullable = 'NO'
-			AND column_default IS NULL"""%(cls._table, cls._db.db_name))
-		cls.REQURED_COLUMNS = set(zip(*cls._db.cursor.fetchall())[0])
-		cls._db.conn.commit()
+		try:
+			cls._db.cursor.execute("SELECT * FROM %s WHERE FALSE"%cls._table)
+			cls.COLUMNS = set([desc.name for desc in cls._db.cursor.description])
+			cls.SECRET_COLUMNS = set(["created_at", "created_by", "approved_at", "approved_by", "rejected_at", "rejected_by", "deleted_at", "deleted_by"])
+			cls._db.cursor.execute("""SELECT column_name FROM information_schema.columns WHERE
+				table_name = '%s'
+				AND table_catalog = '%s'
+				AND is_nullable = 'NO'
+				AND column_default IS NULL"""%(cls._table, cls._db.db_name))
+			cls.REQURED_COLUMNS = set(zip(*cls._db.cursor.fetchall())[0])
+			cls._db.conn.commit()
+		except lib.database.psycopg2.DatabaseError:
+			cls._db.conn.rollback()
+			raise
 
 	def __init__(self, db_id):
 		self._id = db_id
@@ -27,10 +31,14 @@ class Model(object):
 	def _cache_populate(self, key="*"):
 		if key not in self.COLUMNS and key != "*":
 			raise Exception("No column: %s"%key)
-		self._db.cursor.execute("SELECT %s FROM %s WHERE %s = %%s"%(key, self._table, self._primary_key), (self._id,))
-		for k, v in enumerate(self._db.cursor.fetchall()[0]):
-			self._cache[self._db.cursor.description[k].name] = v
-		self._db.conn.commit()
+		try:
+			self._db.cursor.execute("SELECT %s FROM %s WHERE %s = %%s"%(key, self._table, self._primary_key), (self._id,))
+			for k, v in enumerate(self._db.cursor.fetchall()[0]):
+				self._cache[self._db.cursor.description[k].name] = v
+			self._db.conn.commit()
+		except lib.database.psycopg2.DatabaseError:
+			self._db.conn.rollback()
+			raise
 		return v
 
 	def __getitem__(self, key):
@@ -45,8 +53,12 @@ class Model(object):
 	def __setitem__(self, key, value):
 		if key not in self.COLUMNS:
 			raise Exception("No column: %s"%key)
-		self._db.cursor.execute("UPDATE %s SET %s = %%s WHERE %s = %%s"%(self._table, key, self._primary_key), (value, self._id))
-		self._db.conn.commit()
+		try:
+			self._db.cursor.execute("UPDATE %s SET %s = %%s WHERE %s = %%s"%(self._table, key, self._primary_key), (value, self._id))
+			self._db.conn.commit()
+		except lib.database.psycopg2.DatabaseError:
+			self._db.conn.rollback()
+			raise
 		self._cache_populate(key)
 
 	def __delitem__(self, key):
@@ -72,7 +84,7 @@ class Model(object):
 			cls._db.cursor.execute(sql, values)
 			db_id = cls._db.cursor.fetchall()[0][0]
 			cls._db.conn.commit()
-		except IntegrityError:
+		except lib.database.psycopg2.DatabaseError:
 			cls._db.conn.rollback()
 			raise
 		return cls(db_id)
