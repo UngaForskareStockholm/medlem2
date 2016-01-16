@@ -5,6 +5,7 @@ import json
 import datetime
 
 import lib.error
+import lib.helpers
 import model.organization
 import model.user
 
@@ -20,7 +21,7 @@ class Organization(object):
 			return lib.error.APIError("authorization.permission_denied")
 		org = model.organization.Organization(data['organization_id'])
 		if cherrypy.request.method == "GET":
-			return json.JSONEncoder(default=datetime.datetime.isoformat).encode(dict(org)) + "\n"
+			return json.JSONEncoder(default=lib.helpers.typecast_json).encode(dict(org)) + "\n"
 		elif cherrypy.request.method == "POST":
 			org.update_fields(data)
 			cherrypy.response.status = 204
@@ -58,9 +59,10 @@ class Organization(object):
 			return lib.error.APIError("authentication.not_authenticated")
 		user = model.user.User(cherrypy.session["user_id"])
 		if cherrypy.request.method == "GET":
-			response = dict()
-			response['organizations'] = user.organizations()
-			return json.JSONEncoder(default=datetime.datetime.isoformat).encode(dict(response)) + "\n"
+			response = list()
+			for organization_id in user.organizations():
+				response.append(dict(model.organization.Organization(organization_id)))
+			return json.JSONEncoder(default=lib.helpers.typecast_json).encode(response) + "\n"
 		else:
 			cherrypy.response.status = 405
 			cherrypy.response.headers["Allow"] = "GET"
