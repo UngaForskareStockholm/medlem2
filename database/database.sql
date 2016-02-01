@@ -142,6 +142,7 @@ CREATE TABLE reporting_years (
 	municipality TEXT,
 	bank TEXT,
 	account_number TEXT,
+	protocol_id INTEGER,
 	activity_text TEXT,
 	financial_text TEXT,
 	created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -158,6 +159,7 @@ CREATE TABLE reporting_years (
 	FOREIGN KEY (location_id) REFERENCES addresses (address_id),
 	FOREIGN KEY (contactperson_id) REFERENCES persons (person_id),
 	FOREIGN KEY (bylaw_id) REFERENCES bylaws (bylaw_id),
+	FOREIGN KEY (protocol_id) REFERENCES files (file_id),
 	FOREIGN KEY (created_by) REFERENCES users (user_id),
 	FOREIGN KEY (approved_by) REFERENCES users (user_id),
 	FOREIGN KEY (rejected_by) REFERENCES users (user_id)
@@ -207,7 +209,7 @@ CREATE TABLE boards (
 CREATE SEQUENCE file_id_seq START WITH 1;
 
 CREATE TABLE files (
-	file_id INTEGER NOT NULL,
+	file_id INTEGER DEFAULT NEXTVAL('file_id_seq'),
 	file_name TEXT,
 	mime_type TEXT,
 	file_content TEXT,
