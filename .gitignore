@@ -1,4 +1,4 @@
 *.pyc
-config.py
+lib/config.py
 localtest.py
 cookiejar
