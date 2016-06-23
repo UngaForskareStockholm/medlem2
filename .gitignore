@@ -1,3 +1,4 @@
 *.pyc
-config/production.conf
+lib/config.py
+localtest.py
 cookiejar
