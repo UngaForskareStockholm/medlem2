@@ -52,3 +52,28 @@ class User(object):
 			cherrypy.response.status = 405
 			cherrypy.response.headers["Allow"] = "POST"
 			return lib.error.APIError("http.method_not_allowed")
+
+	@cherrypy.expose
+	def has_access(self, user_id, privilige, organization_id=0):
+		if not (cherrypy.session.has_key("authenticated") and cherrypy.session["authenticated"]):
+                        cherrypy.response.status = 409
+                        return lib.error.APIError("authentication.not_authenticated")
+		asking_user = model.user.User(cherrypy.session["user_id"])
+		if not asking_user[user_id] == userid:
+			if not asking_user.has_access("ADMIN"):
+                        cherrypy.response.status = 403
+                        return lib.error.APIError("authorization.permission_denied")
+		user = model.user.User(user_id)
+		
+		if cherrypy.request.method == "GET":
+			if user.has_access(privilige, organization_id):
+				ret= "True"
+			else:
+				ret="False"
+			return json.dumps({"organization_id":str(organization_id), privilige:ret})
+		 else:
+                        cherrypy.response.status = 405
+                        cherrypy.response.headers["Allow"] = "GET"
+                        return lib.error.APIError("http.method_not_allowed")
+
+				
