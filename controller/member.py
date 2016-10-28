@@ -87,7 +87,7 @@ class Member(object):
 			cherrypy.response.status = 409
 			return lib.error.APIError("authentication.not_authenticated")
 		user = model.user.User(cherrypy.session["user_id"])
-		reporing_year = model.reporting_year.ReportingYear(reporting_year)
+		reporting_year = model.reporting_year.ReportingYear(reporting_year)
 		if not user.has_access("ORGANIZATION_ADMIN", reporting_year['organization_id']):
 			cherrypy.response.status = 403
 			return lib.error.APIError("authorization.permission_denied")
