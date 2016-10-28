@@ -217,3 +217,13 @@ CREATE TABLE files (
 	PRIMARY KEY (file_id),
 	FOREIGN KEY (created_by) REFERENCES users (user_id)
 );
+
+CREATE TABLE reporting_files (
+	file_id INTEGER NOT NULL,
+	reporting_year_id INTEGER NOT NULL,
+        report_type TEXT,
+
+        PRIMARY KEY (file_id, reporting_year_id),
+        FOREIGN KEY (file_id) REFERENCES files (file_id),
+        FOREIGN KEY (reporting_year_id) REFERENCES reporting_years (reporting_year_id)
+);
