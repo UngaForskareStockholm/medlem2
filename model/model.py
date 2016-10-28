@@ -17,7 +17,7 @@ class Model(object):
 				AND table_catalog = '%s'
 				AND is_nullable = 'NO'
 				AND column_default IS NULL"""%(cls._table, cls._db.db_name))
-			cls.REQURED_COLUMNS = set(zip(*cls._db.cursor.fetchall())[0])
+			cls.REQUIRED_COLUMNS = set(zip(*cls._db.cursor.fetchall())[0])
 			cls._db.conn.commit()
 		except lib.database.psycopg2.DatabaseError:
 			cls._db.conn.rollback()
@@ -71,7 +71,7 @@ class Model(object):
 	def create(cls, params):
 		param_order = params.keys()
 		param_keys = set(param_order)
-		for column in cls.REQURED_COLUMNS:
+		for column in cls.REQUIRED_COLUMNS:
 			if column not in param_keys:
 				raise Exception("Missing column: %s"%column)
 		sql = "INSERT INTO %s (%s) VALUES (%s) RETURNING %s"% \
